@@ -7,6 +7,7 @@ use App\Http\Resources\BusinessResource;
 use App\Http\Resources\QuestionResource;
 use App\Models\Business;
 use App\Models\Feedback;
+use App\Models\FeedbackDetail;
 use App\Models\ReviewQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -43,29 +44,35 @@ class FeedbackController extends Controller
         $business=Business::find($request->business_id);
         $token = $business->token;
         $chatId = $business->chat_id;
-        foreach ($request->feedback as $key => $feedback) {
-            $feed=Feedback::create([
-                'owner_id'=>$business->owner_id,
+        $feedback=Feedback::create([
+            'owner_id'=>$business->owner_id,
+            'business_id'=>$request->business_id,
+            'comment'=>$request->comment
+        ]);
+        foreach ($request->feedback as $key => $feed) {
+            FeedbackDetail::create([
+                'feedback_id'=>$feedback->id,
                 'business_id'=>$request->business_id,
-                'review_question_id'=>$feedback['question_id'],
-                'rating'=>$feedback['rating']
-            ]);
-            // $message = 
-            //         "*Sorov:* {$feed->reviewQuestion->question}\n" .
-            //         "*Baho:* {$feed->rating}";
-            
-            $stars = str_repeat("⭐", $feed->rating);  // Ratingga qarab yulduzlarni ko‘paytirish
-            // Custom message format
-            $message = "*Новый отзыв⭐️*\n";
-            $message .= "*Ответ: *" . $feed->rating." ".$stars."\n";
-            $message .= "*Вопрос: *" . $feed->reviewQuestion->question;
-
-            Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-                'chat_id' => $chatId,
-                'text' => $message,
-                'parse_mode' => 'Markdown',
+                'review_question_id'=>$feed['question_id'],
+                'rating'=>$feed['rating']
             ]);
         }
+
+        
+        // Custom message format
+        $message = "*Новый отзыв⭐️*\n";
+        foreach ($feedback->feedbackDetails as $key => $detail) {
+            $stars = str_repeat("⭐", $detail->rating);  // Ratingga qarab yulduzlarni ko‘paytirish
+            // $message .= "*Ответ: *" . $detail->rating." ".$stars."\n";
+            $message .= "*Вопрос: *" . $detail->reviewQuestion->question." ". $detail->rating." ".$stars."\n";
+        }
+        $message .= "*Пожелания: *" . $feedback->comment;
+
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'Markdown',
+        ]);
         return response()->json(['message' => 'Feedback success'],200);
     }
 }

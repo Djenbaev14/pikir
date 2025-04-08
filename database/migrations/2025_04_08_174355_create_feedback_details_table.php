@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback', function (Blueprint $table) {
+        Schema::create('feedback_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')->references('id')->on('owners');
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('businesses');
-            $table->longText('comment')->nullable();
-            $table->boolean('telegram_sent')->default(false);
+            $table->unsignedBigInteger('feedback_id');
+            $table->foreign('feedback_id')->references('id')->on('feedback');
+            $table->unsignedBigInteger('review_question_id');
+            $table->foreign('review_question_id')->references('id')->on('review_questions');
+            $table->integer('rating');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('feedback');
+        Schema::dropIfExists('feedback_details');
     }
 };

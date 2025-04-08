@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -62,13 +63,21 @@ class FeedbackResource extends Resource
                     ->label('Бизнес')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('reviewQuestion.question')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('rating')
-                    ->numeric()
+                // Tables\Columns\TextColumn::make('reviewQuestion.question')
+                //     ->numeric()
+                //     ->sortable(),
+                // Tables\Columns\TextColumn::make('feedback_details')
+                //     ->label('Средний рейтинг')
+                //     ->formatStateUsing(function ($state) {
+                //         // Check if there's an average rating available
+                //         return $state->avg('rating');  // 2 decimal places
+                //     })
+                //     ->sortable(),
+                Tables\Columns\TextColumn::make('comment')
+                    ->label('Комментария')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('Дата создания')
                     ->dateTime()
                     ->sortable(),
             ])
@@ -79,17 +88,17 @@ class FeedbackResource extends Resource
                     ->options(fn () => Business::all()->pluck('name', 'id')->map(fn ($name) => $name))
                     ->preload(),
                 
-                SelectFilter::make('rating')
-                    ->label('Рейтинг')
-                    ->searchable()
-                    ->options([
-                        '1'=>1,
-                        '2'=>2,
-                        '3'=>3,
-                        '4'=>4,
-                        '5'=>5,
-                    ])
-                    ->preload(),
+                // SelectFilter::make('rating')
+                //     ->label('Рейтинг')
+                //     ->searchable()
+                //     ->options([
+                //         '1'=>1,
+                //         '2'=>2,
+                //         '3'=>3,
+                //         '4'=>4,
+                //         '5'=>5,
+                //     ])
+                //     ->preload(),
 
             ], layout: FiltersLayout::AboveContent)
             ->actions([
