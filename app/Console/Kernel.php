@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         
-        $schedule->command('app:send-feeback-to-telegram')->everyMinute();
+        // $schedule->command('app:send-feeback-to-telegram')->everyMinute();
     }
 
     /**
@@ -25,6 +25,6 @@ class Kernel extends ConsoleKernel
         // $this->load(__DIR__.'/Commands');
 
         // require base_path('routes/console.php');
-        \App\Console\Commands\SendFeebackToTelegram::class;
+        // \App\Console\Commands\SendFeebackToTelegram::class;
     }
 }
