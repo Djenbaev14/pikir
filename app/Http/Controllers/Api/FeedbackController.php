@@ -30,7 +30,6 @@ class FeedbackController extends Controller
         return $this->responsePagination($business, new BusinessResource($business));
     }
     public function store(Request $request){
-        return $request->all();
         $rules = [
             'business_id'=>'required|exists:businesses,id',
             'feedback'=>'required|array',
