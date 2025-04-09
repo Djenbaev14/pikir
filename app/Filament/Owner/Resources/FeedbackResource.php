@@ -6,7 +6,9 @@ use App\Filament\Owner\Resources\FeedbackResource\Pages;
 use App\Filament\Owner\Resources\FeedbackResource\RelationManagers;
 use App\Models\Business;
 use App\Models\Feedback;
+use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -81,12 +83,47 @@ class FeedbackResource extends Resource
                     ->dateTime()
                     ->sortable(),
             ])
+            ->defaultSort('id','desc')
             ->filters([
                 SelectFilter::make('business_id')
                     ->label('Бизнесы')
                     ->searchable()
                     ->options(fn () => Business::all()->pluck('name', 'id')->map(fn ($name) => $name))
                     ->preload(),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('created_from')
+                                    ->label('Время начала')->columnSpan(1)
+                                    ->placeholder(fn ($state): string => 'Dec 18, ' . now()->subYear()->format('Y')),
+                                Forms\Components\DatePicker::make('created_until')
+                                    ->label('Время окончания')->columnSpan(span: 1)
+                                    ->placeholder(fn ($state): string => now()->format('M d, Y')),
+                            ])
+                    ])->columnSpan(2)
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'] ?? null,
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['created_from'] ?? null) {
+                            $indicators['created_from'] = 'Отзыв от ' . Carbon::parse($data['created_from'])->toFormattedDateString();
+                        }
+                        if ($data['created_until'] ?? null) {
+                            $indicators['created_until'] = 'Отзыв до  ' . Carbon::parse($data['created_until'])->toFormattedDateString();
+                        }
+
+                        return $indicators;
+                    }),
                 
                 // SelectFilter::make('rating')
                 //     ->label('Рейтинг')
