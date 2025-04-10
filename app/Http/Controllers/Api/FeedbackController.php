@@ -24,10 +24,14 @@ class FeedbackController extends Controller
         return $this->responsePagination($questions, QuestionResource::collection($questions));
     }
     public function business(Request $request){
-        $slug=$request->slug;
-        $business=Business::where('slug','=',$slug)->where('status',true)->first();
+        $query=Business::where('status',true);
+        if($request->has('slug')){
+            $slug=$request->slug;
+            $query=$query->where('slug','=',$slug);
+        }
+        $business=$query->get();
         
-        return $this->responsePagination($business, new BusinessResource($business));
+        return $this->responsePagination($business, BusinessResource::collection($business));
     }
     public function store(Request $request){
         $rules = [
