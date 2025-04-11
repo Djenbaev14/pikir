@@ -86,7 +86,7 @@ class BusinessResource extends Resource
                     ->label('QR KOD')
                     ->html()
                     ->formatStateUsing(function ($state, $record) {
-                        $url = "https://qrmap.ru/company/{$record->slug}/review"; // yoki $record->name
+                        $url = "https://pikir-business.netlify.app/{$record->slug}"; // yoki $record->name
                         $qrPng = base64_encode(Qrcode::format('png')->size(150)->generate($url));
                         return "<img src='data:image/png;base64,{$qrPng}' />";
                     }),
