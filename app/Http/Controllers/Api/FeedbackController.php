@@ -67,8 +67,9 @@ class FeedbackController extends Controller
         $message = "*Новый отзыв⭐️*\n";
         foreach ($feedback->feedbackDetails as $key => $detail) {
             $stars = str_repeat("⭐", $detail->rating);  // Ratingga qarab yulduzlarni ko‘paytirish
+            $question=$detail->reviewQuestion->question;
             // $message .= "*Ответ: *" . $detail->rating." ".$stars."\n";
-            $message .= "*Вопрос: *" . $detail->reviewQuestion->question." ". $detail->rating." ".$stars."\n";
+            $message .= "*$question: *" . $detail->rating."-".$stars."\n";
         }
         $message .= "*Пожелания: *" . $feedback->comment;
 
