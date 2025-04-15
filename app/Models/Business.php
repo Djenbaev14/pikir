@@ -40,7 +40,7 @@ class Business extends Model
             }
             
             $url = "https://pikir-business.netlify.app/{$slug}";
-            $qrCode = QrCode::format('png')->size(200)->generate($url);
+            $qrCode = QrCode::format('png')->size(500)->generate($url);
 
             $filePath = auth()->user()->name.'/' . $slug . '.png';
 
