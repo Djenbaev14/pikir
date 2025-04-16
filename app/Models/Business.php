@@ -39,7 +39,7 @@ class Business extends Model
                 $count++;
             }
             
-            $url = "https://pikir-business.netlify.app/{$slug}";
+            $url = "https://edisonnukus.uz/{$slug}";
             $qrCode = QrCode::format('png')->size(500)->generate($url);
 
             $filePath = auth()->user()->name.'/' . $slug . '.png';

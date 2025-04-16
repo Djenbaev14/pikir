@@ -54,6 +54,16 @@ class BusinessResource extends Resource
                             ->required()
                             ->maxLength(255)
                                 ->columnSpan(12),
+                        TextInput::make('token')
+                            ->label('Токен')
+                            ->nullable()
+                            ->maxLength(255)
+                                ->columnSpan(6),
+                        TextInput::make('chat_id')
+                            ->label('Чат Ид')
+                            ->nullable()
+                            ->maxLength(255)
+                                ->columnSpan(6),
                     ])->columnSpan(6)->columns(12),
                     Section::make()
                         ->schema([
@@ -86,8 +96,8 @@ class BusinessResource extends Resource
                     ->label('QR KOD')
                     ->html()
                     ->formatStateUsing(function ($state, $record) {
-                        $url = "https://pikir-business.netlify.app/{$record->slug}"; // yoki $record->name
-                        $qrPng = base64_encode(Qrcode::format('png')->size(150)->generate($url));
+                        $url = "https://edisonnukus.uz/{$record->slug}"; // yoki $record->name
+                        $qrPng = base64_encode(Qrcode::format('png')->size(200)->generate($url));
                         return "<img src='data:image/png;base64,{$qrPng}' />";
                     }),
                 Tables\Columns\IconColumn::make('status')
