@@ -39,7 +39,7 @@ class Business extends Model
                 $count++;
             }
             
-            $url = "https://edisonnukus.uz/{$slug}";
+            $url = "https://edisonnukus.uz/feedback/{$slug}";
             $qrCode = QrCode::format('png')->size(500)->generate($url);
 
             $filePath = auth()->user()->name.'/' . $slug . '.png';
