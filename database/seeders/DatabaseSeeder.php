@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         ]);
         
         Owner::create([
-            'name'=>'Shariyar',
-            'username'=>'shariyar',
-            'password'=>Hash::make('admin')
+            'name'=>'edison',
+            'username'=>'edison',
+            'password'=>Hash::make('ed2025@25e')
         ]);
     }
 }
