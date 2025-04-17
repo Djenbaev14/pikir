@@ -12,14 +12,12 @@ use App\Models\ReviewQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
-
 class FeedbackController extends Controller
 {
-
     public function questions($slug){
         $questions=ReviewQuestion::whereHas('business', function($q) use($slug){
             $q->where('slug', '=', $slug);
-        })->orderBy('id','desc')->get();
+        })->get();
         
         return $this->responsePagination($questions, QuestionResource::collection($questions));
     }
