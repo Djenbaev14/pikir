@@ -17,6 +17,7 @@ class QuestionResource extends JsonResource
         return [
             "id"=>$this->id,
             "question"=>$this->question,
+            "question_options" => $this->whenLoaded('questionOptions', fn () => QuestionOption::collection($this->questionOptions)),
         ];
     }
 }

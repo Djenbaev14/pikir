@@ -13,4 +13,12 @@ class ReviewQuestion extends Model
     {
         return $this->belongsTo(Business::class);
     }
+    public function questionOptions()
+    {
+        return $this->hasMany(QuestionOption::class);
+    }
+    public function getTypeAttribute()
+    {
+        return $this->business->type; // `type`ni `Business` modelidan olamiz
+    }
 }

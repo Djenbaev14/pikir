@@ -10,9 +10,11 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -53,7 +55,11 @@ class BusinessResource extends Resource
                             ->label('Название')
                             ->required()
                             ->maxLength(255)
-                                ->columnSpan(12),
+                            ->columnSpan(12),
+                        Textarea::make('comment_lable')
+                            ->label('Текст комментария')
+                            ->maxLength(255)
+                            ->columnSpan(12),
                         TextInput::make('token')
                             ->label('Токен')
                             ->nullable()
@@ -67,17 +73,42 @@ class BusinessResource extends Resource
                     ])->columnSpan(6)->columns(12),
                     Section::make()
                         ->schema([
+                            Select::make('type')
+                            ->label('Тип вопроса')
+                            ->options([
+                                'rating' => 'Reyting (1–5)',
+                                'single_choice' => 'Variantdan tanlash',
+                            ])
+                            ->required()
+                            ->reactive() // Bu `type` ni filter qilish uchun ishlatiladi
+                            ->columnSpanFull(),
                             Repeater::make('reviewQuestions')
-                                ->label('Вопросы')
-                                ->relationship('reviewQuestions')
-                                ->schema([
-                                    Hidden::make('owner_id')->default(auth()->user()->id),
-                                    Textarea::make('question')
-                                        ->label('Вопрос')
-                                        ->required()
-                                        ->columnSpan(12)
-                                ])->columnSpan(12)
-                        ])->columnSpan(6)->columns(12)
+                            ->label('Вопросы')
+                            ->relationship('reviewQuestions')
+                            ->schema(fn (Get $get) => [
+                                Textarea::make('question')
+                                    ->label('Savol matni')
+                                    ->required(),
+                                Hidden::make('owner_id')->default(auth()->user()->id),
+                        
+                                // Faqat 'single_choice' turida variantlar ko‘rsatiladi
+                                Repeater::make('question_options')
+                                    ->relationship('questionOptions')
+                                    ->label('Variantlar')
+                                    ->schema([
+                                        TextInput::make('text')
+                                            ->label('Variant')
+                                            ->required(),
+                                    ])
+                                    ->minItems(2)
+                                    ->maxItems(6)
+                                    ->visible(fn () => $get('type') === 'single_choice'),
+                            ])
+                            ->visible(fn ($get) => in_array($get('type'), ['rating', 'single_choice']))
+                            ->columnSpanFull(),
+                            
+                        
+                            ])->columnSpan(6)->columns(12)
             ])->columns(12);
     }
 

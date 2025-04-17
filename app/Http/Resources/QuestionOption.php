@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BusinessResource extends JsonResource
+class QuestionOption extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +15,8 @@ class BusinessResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-          "id"=>$this->id,  
-          "name"=>$this->name,  
-          "slug"=>$this->slug,  
-          "comment_lable"=>$this->comment_lable,  
-          "type"=>$this->type,  
-          "logo"=>"storage/".$this->logo,  
+            'id'=>$this->id,
+            'text'=>$this->text,
         ];
     }
 }

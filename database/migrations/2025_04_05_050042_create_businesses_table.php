@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('token')->nullable();
             $table->string('chat_id')->nullable();
             $table->boolean('status')->default(1);
+            $table->longText('comment_lable')->nullable();
+            $table->enum('type', ['rating', 'single_choice']); // otziv turi
             $table->timestamps();
         });
     }

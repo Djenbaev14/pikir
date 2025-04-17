@@ -22,4 +22,8 @@ class FeedbackDetail extends Model
     {
         return $this->belongsTo(ReviewQuestion::class);
     }
+    public function QuestionOption()
+    {
+        return $this->belongsTo(QuestionOption::class);
+    }
 }

@@ -19,7 +19,9 @@ return new class extends Migration
             $table->foreign('feedback_id')->references('id')->on('feedback');
             $table->unsignedBigInteger('review_question_id');
             $table->foreign('review_question_id')->references('id')->on('review_questions');
-            $table->integer('rating');
+            $table->unsignedTinyInteger('rating')->nullable(); // agar rating bo‘lsa
+            $table->unsignedBigInteger('question_option_id');
+            $table->foreign('question_option_id')->references('id')->on('question_options');
             $table->timestamps();
         });
     }

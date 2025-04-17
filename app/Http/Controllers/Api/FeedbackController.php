@@ -17,8 +17,11 @@ class FeedbackController extends Controller
     public function questions($slug){
         $questions=ReviewQuestion::whereHas('business', function($q) use($slug){
             $q->where('slug', '=', $slug);
-        })->get();
-        
+        })
+        ->when(
+            Business::where('slug', $slug)->value('type') === 'single_choice',
+            fn ($query) => $query->with('questionOptions')
+        )->get();
         return $this->responsePagination($questions, QuestionResource::collection($questions));
     }
     public function business(Request $request){
@@ -32,18 +35,26 @@ class FeedbackController extends Controller
         return $this->responsePagination($business, BusinessResource::collection($business));
     }
     public function store(Request $request){
+        $business = Business::findOrFail($request->business_id);
         $rules = [
-            'business_id'=>'required|exists:businesses,id',
-            'feedback'=>'required|array',
-            'feedback.*.question_id'=>'required|exists:review_questions,id',
-            'feedback.*.rating'=>'required|integer',
+            'business_id' => 'required|exists:businesses,id',
+            'feedback' => 'required|array',
+            'feedback.*.question_id' => 'required|exists:review_questions,id',
         ];
+        
+        if ($business->type === 'single_choice') {
+            $rules['feedback.*.question_option_id'] = 'required|exists:question_options,id';
+        }
+        
+        if ($business->type === 'rating') {
+            $rules['feedback.*.rating'] = 'required|integer|min:1|max:5';
+        }
+        
         
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $business=Business::find($request->business_id);
         $token = $business->token;
         $chatId = $business->chat_id;
         $feedback=Feedback::create([
@@ -56,7 +67,8 @@ class FeedbackController extends Controller
                 'feedback_id'=>$feedback->id,
                 'business_id'=>$request->business_id,
                 'review_question_id'=>$feed['question_id'],
-                'rating'=>$feed['rating']
+                'question_option_id'=>$business->type == 'rating' ? null : $feed['question_option_id'],
+                'rating'=>$business->type == 'rating' ? $feed['rating'] : null
             ]);
         }
 
@@ -64,10 +76,17 @@ class FeedbackController extends Controller
         // Custom message format
         $message = "*Новый отзыв⭐️*\n";
         foreach ($feedback->feedbackDetails as $key => $detail) {
-            $stars = str_repeat("⭐", $detail->rating);  // Ratingga qarab yulduzlarni ko‘paytirish
-            $question=$detail->reviewQuestion->question;
-            // $message .= "*Ответ: *" . $detail->rating." ".$stars."\n";
-            $message .= "*$question: *" . $detail->rating."-".$stars."\n";
+            if($business->type == 'rating'){
+                $stars = str_repeat("⭐", $detail->rating);  // Ratingga qarab yulduzlarni ko‘paytirish
+                $question=$detail->reviewQuestion->question;
+                // $message .= "*Ответ: *" . $detail->rating." ".$stars."\n";
+                $message .= "*$question: *" . $detail->rating."-".$stars."\n";
+            }else{
+                $question=$detail->reviewQuestion->question;
+                $text=$detail->QuestionOption->text;
+                // $message .= "*Ответ: *" . $detail->rating." ".$stars."\n";
+                $message .= "*$question: *" . $text."\n";
+            }
         }
         $message .= "*Пожелания: *" . $feedback->comment;
 
