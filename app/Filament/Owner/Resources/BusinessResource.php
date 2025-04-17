@@ -92,14 +92,6 @@ class BusinessResource extends Resource
                     ->label('Название')
                     ->sortable()    
                     ->searchable(),
-                TextColumn::make('qr_code')
-                    ->label('QR KOD')
-                    ->html()
-                    ->formatStateUsing(function ($state, $record) {
-                        $url = "https://edisonnukus.uz/feedback/{$record->slug}"; // yoki $record->name
-                        $qrPng = base64_encode(Qrcode::format('png')->size(200)->generate($url));
-                        return "<img src='data:image/png;base64,{$qrPng}' />";
-                    }),
                 Tables\Columns\IconColumn::make('status')
                     ->label('Статус')
                     ->boolean(),
