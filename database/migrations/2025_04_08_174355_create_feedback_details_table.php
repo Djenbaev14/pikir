@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('review_question_id');
             $table->foreign('review_question_id')->references('id')->on('review_questions');
             $table->unsignedTinyInteger('rating')->nullable(); // agar rating bo‘lsa
-            $table->unsignedBigInteger('question_option_id');
+            $table->unsignedBigInteger('question_option_id')->nullable();
             $table->foreign('question_option_id')->references('id')->on('question_options');
             $table->timestamps();
         });
