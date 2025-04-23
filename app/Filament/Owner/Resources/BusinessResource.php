@@ -131,7 +131,7 @@ class BusinessResource extends Resource
                     ->url(fn ($record) => 'https://edisonnukus.uz/feedback/'.$record->slug)
                     ->color('primary')
                     ->openUrlInNewTab()
-                    ->copyable()
+                    ->copyable(fn ($record) => 'https://edisonnukus.uz/feedback/' . $record->slug)
                     ->copyMessage('URL nusxalandi!')
                     ->copyMessageDuration(1500)
                     ->formatStateUsing(fn ($record) => 'https://edisonnukus.uz/feedback/'.$record->slug)
