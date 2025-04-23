@@ -126,7 +126,7 @@ class BusinessResource extends Resource
                 Tables\Columns\IconColumn::make('status')
                     ->label('Статус')
                     ->boolean(),
-                Tables\Columns\TextColumn::make('qr_code_path')
+                Tables\Columns\TextColumn::make('slug')
                     ->label('Url')
                     ->url(fn ($record) => 'https://edisonnukus.uz/feedback/'.$record->slug)
                     ->color('primary')
