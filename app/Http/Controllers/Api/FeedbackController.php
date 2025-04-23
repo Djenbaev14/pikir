@@ -42,11 +42,11 @@ class FeedbackController extends Controller
             'feedback.*.question_id' => 'required|exists:review_questions,id',
         ];
         
-        if ($business->type === 'single_choice') {
+        if ($business->type == 'single_choice') {
             $rules['feedback.*.question_option_id'] = 'required|exists:question_options,id';
         }
         
-        if ($business->type === 'rating') {
+        if ($business->type == 'rating') {
             $rules['feedback.*.rating'] = 'required|integer|min:1|max:5';
         }
         
