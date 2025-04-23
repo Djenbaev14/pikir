@@ -126,6 +126,16 @@ class BusinessResource extends Resource
                 Tables\Columns\IconColumn::make('status')
                     ->label('Статус')
                     ->boolean(),
+                Tables\Columns\TextColumn::make('qr_code_path')
+                    ->label('Url')
+                    ->url(fn ($record) => 'https://edisonnukus.uz/feedback/'.$record->slug)
+                    ->color('primary')
+                    ->openUrlInNewTab()
+                    ->copyable()
+                    ->copyMessage('URL nusxalandi!')
+                    ->copyMessageDuration(1500)
+                    ->formatStateUsing(fn ($record) => 'https://edisonnukus.uz/feedback/'.$record->slug)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Время создания')
                     ->dateTime()
