@@ -46,21 +46,19 @@ class FeedbackResource extends Resource
                 Placeholder::make('comment')
                 ->label('')
                 ->content(fn ($record) => 'Пожелания: '.$record->comment ?? '-'),
-
                 Placeholder::make('details')
-                    ->label('Javoblar')
-                    ->content(function ($record) {
-                        return $record->feedbackDetails->map(function ($detail) {
-                            $question = $detail->reviewQuestion->question ?? '—';
-                            if ($detail->rating) {
-                                return "{$question} : {$detail->rating} ⭐️";
-                            } elseif ($detail->QuestionOption) {
-                                return "{$question} : {$detail->QuestionOption->text}";
-                            }
-                            return "{$question} : —";
-                        })->implode("<br>");
-                    })
-                    ->disableLabel(),
+                ->label('')
+                ->content(fn ($record) => nl2br(
+                    $record->feedbackDetails->map(function ($detail) {
+                        $question = $detail->reviewQuestion->question ?? '—';
+                        if ($detail->rating) {
+                            return "{$question} : {$detail->rating} ⭐️";
+                        } elseif ($detail->QuestionOption) {
+                            return "{$question} : {$detail->QuestionOption->text}";
+                        }
+                        return "{$question} : —";
+                    })->implode("\n") // \n bo‘lsa nl2br ishlaydi
+                )),
             ])
         ];
     }
