@@ -47,18 +47,22 @@ class FeedbackResource extends Resource
                 ->label('')
                 ->content(fn ($record) => 'Пожелания: '.$record->comment ?? '-'),
                 Placeholder::make('details')
-                ->label('')
-                ->content(fn ($record) => nl2br(
-                    $record->feedbackDetails->map(function ($detail) {
-                        $question = $detail->reviewQuestion->question ?? '—';
-                        if ($detail->rating) {
-                            return "{$question} : {$detail->rating} ⭐️";
-                        } elseif ($detail->QuestionOption) {
-                            return "{$question} : {$detail->QuestionOption->text}";
-                        }
-                        return "{$question} : —";
-                    })->implode("\n") // \n bo‘lsa nl2br ishlaydi
-                )),
+    ->label('')
+    ->content(function ($record) {
+        // Har bir elementni alohida qatorga joylash uchun to‘g‘ri formatlash
+        $formattedDetails = $record->feedbackDetails->map(function ($detail) {
+            $question = $detail->reviewQuestion->question ?? '—';
+            if ($detail->rating) {
+                return "{$question} : {$detail->rating} ⭐️";
+            } elseif ($detail->QuestionOption) {
+                return "{$question} : {$detail->QuestionOption->text}";
+            }
+            return "{$question} : —";
+        })->implode("\n"); // \n bilan har bir elementni ajratamiz
+
+        // nl2br HTML formatga o‘tkazadi
+        return nl2br($formattedDetails);
+    }),
             ])
         ];
     }
