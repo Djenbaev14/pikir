@@ -45,25 +45,13 @@ class FeedbackResource extends Resource
             ->schema([
                 Placeholder::make('comment')
                 ->label('')
-                ->content(fn ($record) => 'Пожелания: '.$record->comment ?? '-'),
+                ->content(fn ($record) => 'Пожелания: '.$record->comment ?? '-')->columnSpan(12),
                 Placeholder::make('details')
-    ->label('')
-    ->content(function ($record) {
-        // Har bir elementni alohida qatorga joylash uchun to‘g‘ri formatlash
-        $formattedDetails = $record->feedbackDetails->map(function ($detail) {
-            $question = $detail->reviewQuestion->question ?? '—';
-            if ($detail->rating) {
-                return "{$question} : {$detail->rating} ⭐️";
-            } elseif ($detail->QuestionOption) {
-                return "{$question} : {$detail->QuestionOption->text}";
-            }
-            return "{$question} : —";
-        })->implode("<br>"); // \n bilan har bir elementni ajratamiz
-
-        // nl2br HTML formatga o‘tkazadi
-        return nl2br($formattedDetails);
-    }),
-            ])
+                    ->label('')
+                    ->content(
+                        fn ($record) => view('components.feedback-details-table', ['record' => $record])
+                    )->columnSpan(12),
+            ])->columns(12)->columnSpan(12)
         ];
     }
     
