@@ -58,7 +58,7 @@ class FeedbackResource extends Resource
                 return "{$question} : {$detail->QuestionOption->text}";
             }
             return "{$question} : —";
-        })->implode("\n"); // \n bilan har bir elementni ajratamiz
+        })->implode("<br>"); // \n bilan har bir elementni ajratamiz
 
         // nl2br HTML formatga o‘tkazadi
         return nl2br($formattedDetails);
