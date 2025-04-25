@@ -4,6 +4,8 @@ namespace App\Filament\Owner\Resources\FeedbackResource\Pages;
 
 use App\Filament\Owner\Resources\FeedbackResource;
 use Filament\Actions;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Pages\EditRecord;
 
 class EditFeedback extends EditRecord
@@ -16,4 +18,5 @@ class EditFeedback extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+    
 }

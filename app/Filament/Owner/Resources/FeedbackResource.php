@@ -8,8 +8,10 @@ use App\Models\Business;
 use App\Models\Feedback;
 use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -28,30 +30,41 @@ class FeedbackResource extends Resource
     protected static ?string $model = Feedback::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                // Section::make('feedback')
-                //     ->schema([
-                //         Hidden::make('owner_id')->default(auth()->user()->id),
-                //         Select::make('business_id')
-                //             ->relationship('business','name')
-                //             ->label('Бизнесы')
-                //             ->searchable(),
-                //         Repeater::make('question')
-                //             ->schema([
-                //             Select::make('review_question_id')
-                //                 ->required()
-                //                 ->numeric(),
-                //             Forms\Components\TextInput::make('rating')
-                //                 ->required()
-                //                 ->numeric(),
-                //             ])
-                //     ])
-            ]);
+        return $form->schema(fn ($livewire) => 
+            $livewire instanceof CreateRecord
+                ? self::createSchema()
+                : self::viewSchema()
+        );
     }
+    protected static function viewSchema(): array
+    {
+        return [
+            Card::make()
+            ->schema([
+                Placeholder::make('comment')
+                ->label('')
+                ->content(fn ($record) => 'Пожелания: '.$record->comment ?? '-'),
+
+                Placeholder::make('details')
+                    ->label('Javoblar')
+                    ->content(function ($record) {
+                        return $record->feedbackDetails->map(function ($detail) {
+                            $question = $detail->reviewQuestion->question ?? '—';
+                            if ($detail->rating) {
+                                return "{$question} : {$detail->rating} ⭐️";
+                            } elseif ($detail->QuestionOption) {
+                                return "{$question} : {$detail->QuestionOption->text}";
+                            }
+                            return "{$question} : —";
+                        })->implode("<br>");
+                    })
+                    ->disableLabel(),
+            ])
+        ];
+    }
+    
 
     public static function table(Table $table): Table
     {
@@ -184,7 +197,7 @@ class FeedbackResource extends Resource
         return [
             'index' => Pages\ListFeedback::route('/'),
             'create' => Pages\CreateFeedback::route('/create'),
-            'edit' => Pages\EditFeedback::route('/{record}/edit'),
+            'view' => Pages\ViewFeedback::route('/{record}'),
         ];
     }
 }
