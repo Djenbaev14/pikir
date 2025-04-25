@@ -86,6 +86,7 @@ class FeedbackResource extends Resource
                     ->dateTime()
                     ->sortable(),
             ])
+            ->defaultPaginationPageOption(50)
             ->defaultSort('id','desc')
             ->filters([
                 SelectFilter::make('business_id')
