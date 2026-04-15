@@ -12,6 +12,7 @@ use App\Models\ReviewQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 class FeedbackController extends Controller
 {
     public function questions($slug){
@@ -90,11 +91,18 @@ class FeedbackController extends Controller
         }
         $message .= "*Пожелания: *" . $feedback->comment;
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $message,
             'parse_mode' => 'Markdown',
         ]);
+
+        if ($response->successful()) {
+            Log::info('SMS yuborildi', ['feedback_id' => $feedback->id]);
+        } else {
+            Log::error('SMS yuborilmadi', ['feedback_id' => $feedback->id, 'status' => $response->status()]);
+        }
+
         return response()->json(['message' => 'Feedback success'],200);
     }
 }
