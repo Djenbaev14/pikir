@@ -11,7 +11,7 @@ class SetTelegramWebhook extends Command
     /**
      * @var string
      */
-    protected $signature = 'telegram:set-webhook {--url= : Public bazaviy URL (masalan https://edisonnukus.uz). Bo\'sh bo\'lsa APP_URL ishlatiladi}';
+    protected $signature = 'telegram:set-webhook {--token= : Bot token (bo\'sh bo\'lsa .env yoki bazadan olinadi)}';
 
     /**
      * @var string
@@ -20,7 +20,7 @@ class SetTelegramWebhook extends Command
 
     public function handle()
     {
-        $token = Telegram::token();
+        $token = $this->option('token') ?: Telegram::token();
 
         if (empty($token)) {
             $this->error('Bot tokeni topilmadi (.env TELEGRAM_BOT_TOKEN ham, businesses.token ham bo\'sh).');
@@ -29,8 +29,9 @@ class SetTelegramWebhook extends Command
 
         $base = Telegram::apiBase();
         $secret = Telegram::webhookSecret();
-        $appUrl = $this->option('url') ?: config('app.url');
-        $webhookUrl = rtrim((string) $appUrl, '/') . '/api/telegram/webhook/' . $secret;
+
+        // URL .env dagi APP_URL dan olinadi.
+        $webhookUrl = rtrim((string) config('app.url'), '/') . '/api/telegram/webhook/' . $secret;
 
         $response = Http::get("{$base}/bot{$token}/setWebhook", [
             'url' => $webhookUrl,
@@ -43,6 +44,8 @@ class SetTelegramWebhook extends Command
         }
 
         $this->error('Webhook o\'rnatilmadi: ' . $response->body());
+        $this->line('Ishlatilgan token (boshi): ' . substr((string) $token, 0, 12) . '...');
+        $this->line('URL: ' . $webhookUrl);
         return Command::FAILURE;
     }
 }
