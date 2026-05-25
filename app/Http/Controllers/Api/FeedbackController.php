@@ -9,6 +9,8 @@ use App\Models\Business;
 use App\Models\Feedback;
 use App\Models\FeedbackDetail;
 use App\Models\ReviewQuestion;
+use App\Models\TelegramChat;
+use App\Support\Telegram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -61,8 +63,6 @@ class FeedbackController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $token = $business->token;
-        $chatId = $business->chat_id;
         $feedback = Feedback::create([
             'owner_id' => $business->owner_id,
             'business_id' => $request->business_id,
@@ -96,16 +96,56 @@ class FeedbackController extends Controller
         }
         $message .= "*Пожелания: *" . $feedback->comment;
 
-        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => $message,
-            'parse_mode' => 'Markdown',
-        ]);
+        $base = Telegram::apiBase();
 
-        if ($response->successful()) {
-            Log::info('SMS yuborildi', ['feedback_id' => $feedback->id]);
-        } else {
-            Log::error('SMS yuborilmadi', ['feedback_id' => $feedback->id, 'status' => $response->status()]);
+        // 1) ESKI yo'l (backward-compat): biznesning o'z chat_id'siga — hozirgidek.
+        //    Deploy paytida hech narsa uzilmasligi uchun saqlanadi.
+        if (!empty($business->token) && !empty($business->chat_id)) {
+            $response = Http::post("{$base}/bot{$business->token}/sendMessage", [
+                'chat_id' => $business->chat_id,
+                'text' => $message,
+                'parse_mode' => 'Markdown',
+            ]);
+
+            if ($response->successful()) {
+                Log::info('Otziv eski chat_id ga yuborildi', [
+                    'feedback_id' => $feedback->id,
+                    'chat_id' => $business->chat_id,
+                ]);
+            } else {
+                Log::error('Otziv eski chat_id ga yuborilmadi', [
+                    'feedback_id' => $feedback->id,
+                    'status' => $response->status(),
+                ]);
+            }
+        }
+
+        // 2) YANGI yo'l: bot ulangan barcha faol guruhlarga yuboramiz.
+        //    Bu bot webhook bilan guruhlarni ushlagan bot bilan bir xil bo'lishi shart.
+        $token = Telegram::token();
+        $chats = TelegramChat::where('is_active', true)->get();
+
+        if (!empty($token)) {
+            foreach ($chats as $chat) {
+                $response = Http::post("{$base}/bot{$token}/sendMessage", [
+                    'chat_id' => $chat->chat_id,
+                    'text' => $message,
+                    'parse_mode' => 'Markdown',
+                ]);
+
+                if ($response->successful()) {
+                    Log::info('Otziv guruhga yuborildi', [
+                        'feedback_id' => $feedback->id,
+                        'chat_id' => $chat->chat_id,
+                    ]);
+                } else {
+                    Log::error('Otziv guruhga yuborilmadi', [
+                        'feedback_id' => $feedback->id,
+                        'chat_id' => $chat->chat_id,
+                        'status' => $response->status(),
+                    ]);
+                }
+            }
         }
 
         return response()->json(['message' => 'Feedback success'], 200);

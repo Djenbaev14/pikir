@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\TelegramWebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +24,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('feedback',[FeedbackController::class,'store']);
 Route::get('questions/{slug}',[FeedbackController::class,'questions']);
 Route::get('business',[FeedbackController::class,'business']);
+
+// Telegram webhook — bot guruhga qo'shilganda chat_id ni avtomatik oladi.
+Route::post('telegram/webhook/{secret}', [TelegramWebhookController::class, 'handle']);
