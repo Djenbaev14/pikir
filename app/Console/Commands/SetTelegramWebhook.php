@@ -33,7 +33,7 @@ class SetTelegramWebhook extends Command
         // URL .env dagi APP_URL dan olinadi.
         $webhookUrl = rtrim((string) config('app.url'), '/') . '/api/telegram/webhook/' . $secret;
 
-        $response = Http::get("{$base}/bot{$token}/setWebhook", [
+        $response = Telegram::http()->get("{$base}/bot{$token}/setWebhook", [
             'url' => $webhookUrl,
             'allowed_updates' => json_encode(['my_chat_member']),
         ]);

@@ -101,7 +101,7 @@ class FeedbackController extends Controller
         // 1) ESKI yo'l (backward-compat): biznesning o'z chat_id'siga — hozirgidek.
         //    Deploy paytida hech narsa uzilmasligi uchun saqlanadi.
         if (!empty($business->token) && !empty($business->chat_id)) {
-            $response = Http::post("{$base}/bot{$business->token}/sendMessage", [
+            $response = Telegram::http()->post("{$base}/bot{$business->token}/sendMessage", [
                 'chat_id' => $business->chat_id,
                 'text' => $message,
                 'parse_mode' => 'Markdown',
@@ -127,7 +127,7 @@ class FeedbackController extends Controller
 
         if (!empty($token)) {
             foreach ($chats as $chat) {
-                $response = Http::post("{$base}/bot{$token}/sendMessage", [
+                $response = Telegram::http()->post("{$base}/bot{$token}/sendMessage", [
                     'chat_id' => $chat->chat_id,
                     'text' => $message,
                     'parse_mode' => 'Markdown',

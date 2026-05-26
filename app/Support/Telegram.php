@@ -39,6 +39,18 @@ class Telegram
     }
 
     /**
+     * Telegram so'rovlari uchun HTTP klient.
+     *
+     * Worker (api_base) Cloudflare'da bo'lib, to'g'ridan ochiladi.
+     * Shu sabab serverdagi flaky SOCKS proxy (all_proxy/https_proxy env)
+     * ni chetlab o'tamiz — aks holda u o'chganda xabar yuborilmay qoladi.
+     */
+    public static function http()
+    {
+        return \Illuminate\Support\Facades\Http::withOptions(['proxy' => '']);
+    }
+
+    /**
      * Webhook URL ichidagi maxfiy kalit.
      * .env da bo'lmasa, tokendan deterministik tarzda hosil qilinadi.
      */
